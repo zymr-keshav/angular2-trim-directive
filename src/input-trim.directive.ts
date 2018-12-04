@@ -109,25 +109,20 @@ export class InputTrimDirective implements ControlValueAccessor {
    *
    * @param {string} value - input value
    * @param {string} event - input event
+   * refector condition when there is single character and it does not update the model value
    */
   private updateValue(event: string, value: string): void {
-    // check if the user has set an optional attribute. Trimmmm!!! Uhahahaha!
-    value = this.trim !== "" && event !== this.trim ? value : value.trim();
+        const currentValue = this.trim !== '' && event !== this.trim ? value : value.trim();
+        const previousValue = this._value;
+        let trimmedPreviousValue = '';
+        if (Boolean(previousValue)) {
+            trimmedPreviousValue = previousValue.trim();
+        }
 
-    const previous = this._value;
-
-    // write value to the element.
-    this.writeValue(value);
-
-    // Update model only when getting new value, and prevent firing
-    // the `dirty` state for empty fields.
-    //
-    // ISSUE: https://github.com/anein/angular2-trim-directive/issues/17
-    //
-    // TODO: Optimize
-    //
-    if (previous && (this._value.trim() !== "" || previous.trim() !== "") && this._value.trim() !== previous) {
-      this.onChange(this._value);
+        this.writeValue(currentValue);
+        const trimmedValue = this._value.trim();
+        if (trimmedValue !== previousValue && (trimmedValue !== '' || trimmedPreviousValue !== '')) {
+            this.onChange(this._value);
+        }
     }
-  }
 }
